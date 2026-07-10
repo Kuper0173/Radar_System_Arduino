@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Build the Radar - Connection Challenge</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel-soft: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --green: #22c55e;
+      --blue: #38bdf8;
+      --yellow: #facc15;
+      --red: #fb7185;
+      --purple: #c084fc;
+      --orange: #fb923c;
+      --border: #334155;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: radial-gradient(circle at top, #1e293b, var(--bg));
+      color: var(--text);
+    }
+
+    header {
+      width: min(1050px, 94vw);
+      margin: 0 auto;
+      padding: 30px 0 14px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+      font-size: clamp(30px, 5vw, 48px);
+    }
+
+    header p {
+      max-width: 760px;
+      margin: 0 auto;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .guide,
+    .theory-lab,
+    .component-card,
+    .final-check {
+      width: min(1050px, 94vw);
+      margin: 0 auto;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: rgba(17, 24, 39, 0.9);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    }
+
+    .guide {
+      padding: 18px;
+      margin-top: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .guide h2,
+    .final-check h2 {
+      margin: 0;
+      color: var(--blue);
+      font-size: 22px;
+    }
+
+    .guide p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .step {
+      padding: 12px;
+      border-radius: 16px;
+      background: var(--panel-soft);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #dbeafe;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .step strong {
+      display: block;
+      color: var(--green);
+      margin-bottom: 4px;
+    }
+
+    .theory-lab {
+      margin-top: 14px;
+      padding: 20px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .theory-lab h2 {
+      margin: 0;
+      color: var(--blue);
+      font-size: 24px;
+    }
+
+    .theory-lab > p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .theory-layout {
+      display: grid;
+      grid-template-columns: 230px 1fr;
+      gap: 14px;
+    }
+
+    .theory-tabs {
+      display: grid;
+      gap: 8px;
+      align-content: start;
+    }
+
+    .theory-button {
+      border: 1px solid rgba(255,255,255,0.1);
+      background: var(--panel-soft);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 12px;
+      text-align: left;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s, background 0.2s;
+    }
+
+    .theory-button:hover,
+    .theory-button.active {
+      transform: translateX(3px);
+      border-color: var(--green);
+      background: rgba(34, 197, 94, 0.09);
+    }
+
+    .theory-window {
+      min-height: 230px;
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid rgba(56, 189, 248, 0.22);
+      background:
+        radial-gradient(circle at top right, rgba(56,189,248,0.15), transparent 40%),
+        rgba(255,255,255,0.055);
+      line-height: 1.55;
+    }
+
+    .theory-window h3 {
+      margin: 0 0 8px;
+      font-size: 24px;
+      color: var(--green);
+    }
+
+    .theory-window p {
+      margin: 0 0 10px;
+      color: #dbeafe;
+    }
+
+    .theory-window ul {
+      margin: 8px 0 0;
+      padding-left: 20px;
+      color: var(--muted);
+    }
+
+    .theory-badge {
+      display: inline-block;
+      margin-bottom: 10px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(250, 204, 21, 0.12);
+      border: 1px solid rgba(250, 204, 21, 0.25);
+      color: #fde68a;
+      font-size: 13px;
+    }
+
+    .cards {
+      display: grid;
+      gap: 22px;
+      margin: 22px 0;
+    }
+
+    .component-card {
+      min-height: 420px;
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 22px;
+      align-items: stretch;
+      opacity: 0;
+      transform: translateY(35px);
+      transition: opacity 0.6s ease, transform 0.6s ease, border-color 0.25s ease;
+    }
+
+    .component-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .component-card:hover {
+      border-color: var(--blue);
+    }
+
+    .component-visual {
+      border-radius: 20px;
+      padding: 18px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.14);
+      min-height: 260px;
+    }
+
+    .component-visual h2 {
+      margin: 0 0 8px;
+      font-size: 28px;
+    }
+
+    .component-visual p {
+      margin: 0;
+      color: rgba(255,255,255,0.78);
+      line-height: 1.45;
+    }
+
+    .arduino-card .component-visual {
+      background: linear-gradient(145deg, #0b5e8e, #063a5c);
+    }
+
+    .breadboard-card .component-visual {
+      background: linear-gradient(145deg, #f8fafc, #cbd5e1);
+      color: #111827;
+    }
+
+    .breadboard-card .component-visual p {
+      color: #334155;
+    }
+
+    .joystick-card .component-visual {
+      background: linear-gradient(145deg, #581c87, #312e81);
+    }
+
+    .servo-card .component-visual {
+      background: linear-gradient(145deg, #2563eb, #1d4ed8);
+    }
+
+    .ultrasonic-card .component-visual {
+      background: linear-gradient(145deg, #334155, #111827);
+    }
+
+    .oled-card .component-visual {
+      background: linear-gradient(145deg, #020617, #172554);
+    }
+
+    .component-content {
+      display: grid;
+      align-content: start;
+      gap: 14px;
+    }
+
+    .component-content h3 {
+      margin: 0;
+      color: var(--blue);
+      font-size: 22px;
+    }
+
+    .component-content > p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tab-button {
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, transform 0.2s;
+    }
+
+    .tab-button:hover,
+    .tab-button.active {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: var(--blue);
+      transform: translateY(-1px);
+    }
+
+    .tab-panel {
+      padding: 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.055);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #dbeafe;
+      line-height: 1.55;
+      min-height: 150px;
+    }
+
+    .tab-panel strong {
+      color: var(--green);
+    }
+
+    .pin-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .pin {
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.45);
+      border: 1px solid rgba(255,255,255,0.08);
+      font-size: 14px;
+    }
+
+    .pin.power { border-color: rgba(251, 113, 133, 0.45); }
+    .pin.ground { border-color: rgba(255,255,255,0.25); }
+    .pin.signal { border-color: rgba(250, 204, 21, 0.45); }
+    .pin.i2c { border-color: rgba(56, 189, 248, 0.45); }
+
+    .connection-note {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(34, 197, 94, 0.08);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+      color: #bbf7d0;
+      font-size: 14px;
+    }
+
+    .learn-more {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.09);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .learn-more span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .learn-more a {
+      color: #bae6fd;
+      text-decoration: none;
+      border: 1px solid rgba(56,189,248,0.35);
+      background: rgba(56,189,248,0.1);
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 13px;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .learn-more a:hover {
+      background: rgba(56,189,248,0.22);
+      transform: translateY(-1px);
+    }
+
+    .final-check {
+      padding: 22px;
+      margin-bottom: 32px;
+    }
+
+    .checklist {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .checklist label {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      color: var(--muted);
+      line-height: 1.45;
+      padding: 12px;
+      background: var(--panel-soft);
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .checklist input {
+      margin-top: 3px;
+      accent-color: var(--green);
+    }
+
+    @media (max-width: 800px) {
+      .steps,
+      .checklist,
+      .theory-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .component-card {
+        grid-template-columns: 1fr;
+        min-height: 0;
+      }
+
+      .component-visual {
+        min-height: 190px;
+      }
+
+      .pin-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Build the Radar</h1>
+    <p>
+      A simple connection challenge for an Arduino radar system. Students receive the components and wires,
+      then build the circuit step by step.
+    </p>
+  </header>
+
+  <section class="guide">
+    <h2>How to use this resource</h2>
+    <p>
+      Scroll down and work with one component at a time. Each card includes the connections, a short explanation
+      of how the component works, and a small tip. Click the tabs inside each card to change the information.
+    </p>
+    <div class="steps">
+      <div class="step"><strong>1. Identify</strong>Find the component on your table.</div>
+      <div class="step"><strong>2. Connect</strong>Use the connection tab to wire it.</div>
+      <div class="step"><strong>3. Understand</strong>Open “How it works” if you want more depth.</div>
+      <div class="step"><strong>4. Check</strong>Use the final checklist before testing.</div>
+    </div>
+  </section>
+
+  <section class="theory-lab" aria-label="Electronics theory lab">
+    <h2>Theory Lab: what did you just build?</h2>
+    <p>
+      This radar is not only a wiring exercise. It is a tiny mix of engineering fields working together.
+      Open each window to discover the ideas hiding inside the project.
+    </p>
+
+    <div class="theory-layout">
+      <div class="theory-tabs" role="tablist" aria-label="Project theory topics">
+        <button class="theory-button active" type="button" data-theory="control">🎮 Control</button>
+        <button class="theory-button" type="button" data-theory="sensing">🦇 Sensing</button>
+        <button class="theory-button" type="button" data-theory="embedded">🧠 Embedded systems</button>
+        <button class="theory-button" type="button" data-theory="signals">〰️ Signals</button>
+        <button class="theory-button" type="button" data-theory="interface">🖥️ Human interface</button>
+      </div>
+
+      <div class="theory-window" id="theory-window">
+        <span class="theory-badge">🎮 Control systems</span>
+        <h3>The joystick becomes a command</h3>
+        <p>
+          When you move the joystick, you are giving the Arduino a desired action. The Arduino reads that input
+          and turns it into servo movement.
+        </p>
+        <ul>
+          <li>Input: joystick position.</li>
+          <li>Controller: Arduino code.</li>
+          <li>Output: servo angle.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <main class="cards">
+    <article class="component-card arduino-card">
+      <div class="component-visual">
+        <div>
+          <h2>Arduino Uno</h2>
+          <p>The brain of the radar system.</p>
+        </div>
+      </div>
+      <div class="component-content">
+        <h3>Step 1: Arduino</h3>
+        <p>Start by locating the pins that will receive information and control the other parts.</p>
+        <div class="tabs">
+          <button class="tab-button active" data-tab="connections">Connections</button>
+          <button class="tab-button" data-tab="works">How it works</button>
+          <button class="tab-button" data-tab="tips">Tips</button>
+        </div>
+        <div class="tab-panel">
+          <strong>Main pins used:</strong>
+          <div class="pin-grid">
+            <div class="pin signal">D2 → Joystick SW</div>
+            <div class="pin signal">D9 → Servo signal</div>
+            <div class="pin signal">D10 → Ultrasonic Trig</div>
+            <div class="pin signal">D11 → Ultrasonic Echo</div>
+            <div class="pin signal">A0/A1 → Joystick axes</div>
+            <div class="pin i2c">A4/A5 → OLED I2C</div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="component-card breadboard-card">
+      <div class="component-visual">
+        <div>
+          <h2>Breadboard</h2>
+          <p>Organizes power, ground and signal wires.</p>
+        </div>
+      </div>
+      <div class="component-content">
+        <h3>Step 2: Breadboard</h3>
+        <p>Use the breadboard to keep the circuit ordered and easier to debug.</p>
+        <div class="tabs">
+          <button class="tab-button active" data-tab="connections">Connections</button>
+          <button class="tab-button" data-tab="works">How it works</button>
+          <button class="tab-button" data-tab="tips">Tips</button>
+        </div>
+        <div class="tab-panel">
+          <strong>Recommended organization:</strong>
+          <div class="pin-grid">
+            <div class="pin power">Arduino 5V → + rail</div>
+            <div class="pin ground">Arduino GND → - rail</div>
+            <div class="pin signal">Signal wires → Arduino pins</div>
+            <div class="pin">Modules → stable rows</div>
+          </div>
+          <div class="connection-note">All GND connections must share the same ground.</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="component-card joystick-card">
+      <div class="component-visual">
+        <div>
+          <h2>Joystick</h2>
+          <p>Controls the radar angle.</p>
+        </div>
+      </div>
+      <div class="component-content">
+        <h3>Step 3: Joystick</h3>
+        <p>The joystick lets the student move the servo without using the Serial Monitor.</p>
+        <div class="tabs">
+          <button class="tab-button active" data-tab="connections">Connections</button>
+          <button class="tab-button" data-tab="works">How it works</button>
+          <button class="tab-button" data-tab="tips">Tips</button>
+        </div>
+        <div class="tab-panel">
+          <strong>Connect the joystick:</strong>
+          <div class="pin-grid">
+            <div class="pin ground">GND → GND</div>
+            <div class="pin power">5V → 5V</div>
+            <div class="pin signal">URX → A0</div>
+            <div class="pin signal">URY → A1</div>
+            <div class="pin signal">SW → D2</div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="component-card servo-card">
+      <div class="component-visual">
+        <div>
+          <h2>Micro Servo</h2>
+          <p>Rotates from 0° to 180°.</p>
+        </div>
+      </div>
+      <div class="component-content">
+        <h3>Step 4: Servo</h3>
+        <p>The servo moves the ultrasonic sensor to scan different angles.</p>
+        <div class="tabs">
+          <button class="tab-button active" data-tab="connections">Connections</button>
+          <button class="tab-button" data-tab="works">How it works</button>
+          <button class="tab-button" data-tab="tips">Tips</button>
+        </div>
+        <div class="tab-panel">
+          <strong>Connect the servo:</strong>
+          <div class="pin-grid">
+            <div class="pin signal">Signal → D9</div>
+            <div class="pin power">Red wire → 5V</div>
+            <div class="pin ground">Brown/Black wire → GND</div>
+          </div>
+          <div class="connection-note">If the servo shakes, use an external 5V supply and connect grounds together.</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="component-card ultrasonic-card">
+      <div class="component-visual">
+        <div>
+          <h2>Ultrasonic</h2>
+          <p>Measures distance using sound.</p>
+        </div>
+      </div>
+      <div class="component-content">
+        <h3>Step 5: Ultrasonic Sensor</h3>
+        <p>This sensor detects how far an object is from the radar.</p>
+        <div class="tabs">
+          <button class="tab-button active" data-tab="connections">Connections</button>
+          <button class="tab-button" data-tab="works">How it works</button>
+          <button class="tab-button" data-tab="tips">Tips</button>
+        </div>
+        <div class="tab-panel">
+          <strong>Connect the ultrasonic sensor:</strong>
+          <div class="pin-grid">
+            <div class="pin power">VCC → 5V</div>
+            <div class="pin ground">GND → GND</div>
+            <div class="pin signal">Trig → D10</div>
+            <div class="pin signal">Echo → D11</div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="component-card oled-card">
+      <div class="component-visual">
+        <div>
+          <h2>OLED Display</h2>
+          <p>Shows distance, angle and alerts.</p>
+        </div>
+      </div>
+      <div class="component-content">
+        <h3>Step 6: OLED Display</h3>
+        <p>The display uses I2C communication, so it only needs two data wires.</p>
+        <div class="tabs">
+          <button class="tab-button active" data-tab="connections">Connections</button>
+          <button class="tab-button" data-tab="works">How it works</button>
+          <button class="tab-button" data-tab="tips">Tips</button>
+        </div>
+        <div class="tab-panel">
+          <strong>Connect the OLED:</strong>
+          <div class="pin-grid">
+            <div class="pin ground">GND → GND</div>
+            <div class="pin power">VCC → 5V</div>
+            <div class="pin i2c">SDA → A4</div>
+            <div class="pin i2c">SCL → A5</div>
+          </div>
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <section class="final-check">
+    <h2>Final checklist</h2>
+    <div class="checklist">
+      <label><input type="checkbox"> All GND pins share the same ground.</label>
+      <label><input type="checkbox"> 5V is connected only to VCC / power pins.</label>
+      <label><input type="checkbox"> Servo signal is connected to D9.</label>
+      <label><input type="checkbox"> Ultrasonic Trig and Echo are not swapped.</label>
+      <label><input type="checkbox"> Joystick URY is connected to A1.</label>
+      <label><input type="checkbox"> OLED SDA and SCL are connected to A4 and A5.</label>
+    </div>
+  </section>
+
+  <script>
+    const theoryContent = {
+      control: `
+        <span class="theory-badge">🎮 Control systems</span>
+        <h3>The joystick becomes a command</h3>
+        <p>
+          When you move the joystick, you are giving the Arduino a desired action. The Arduino reads that input
+          and turns it into servo movement.
+        </p>
+        <ul>
+          <li>Input: joystick position.</li>
+          <li>Controller: Arduino code.</li>
+          <li>Output: servo angle.</li>
+        </ul>`,
+      sensing: `
+        <span class="theory-badge">🦇 Ultrasonic sensing</span>
+        <h3>The radar “listens” like a tiny bat</h3>
+        <p>
+          The ultrasonic sensor sends a sound pulse and waits for the echo. The Arduino uses the travel time
+          to estimate distance.
+        </p>
+        <ul>
+          <li>Trig starts the sound pulse.</li>
+          <li>Echo returns the time measurement.</li>
+          <li>Distance comes from time and speed of sound.</li>
+        </ul>`,
+      embedded: `
+        <span class="theory-badge">🧠 Embedded systems</span>
+        <h3>A computer hidden inside an object</h3>
+        <p>
+          An embedded system is a small computer designed for a specific job. Here, the Arduino does one mission:
+          control a radar-like circuit.
+        </p>
+        <ul>
+          <li>Reads physical inputs.</li>
+          <li>Makes decisions using code.</li>
+          <li>Controls hardware in real time.</li>
+        </ul>`,
+      signals: `
+        <span class="theory-badge">〰️ Signals and communication</span>
+        <h3>Wires are carrying messages</h3>
+        <p>
+          Some wires carry power, but others carry information. The servo signal, Echo pulse and OLED I2C lines
+          are all different kinds of electrical messages.
+        </p>
+        <ul>
+          <li>PWM-style pulses control the servo.</li>
+          <li>Echo pulse length represents distance.</li>
+          <li>I2C uses SDA and SCL to talk to the OLED.</li>
+        </ul>`,
+      interface: `
+        <span class="theory-badge">🖥️ Human-machine interface</span>
+        <h3>The circuit talks back to the user</h3>
+        <p>
+          The OLED display turns invisible measurements into visible information. That is interface design:
+          making technology understandable for humans.
+        </p>
+        <ul>
+          <li>Distance becomes readable text.</li>
+          <li>Angle becomes feedback.</li>
+          <li>“Detected!” becomes an alert.</li>
+        </ul>`
+    };
+
+    const tabContent = {
+      "Arduino Uno": {
+        connections: `
+          <strong>Main pins used:</strong>
+          <div class="pin-grid">
+            <div class="pin signal">D2 → Joystick SW</div>
+            <div class="pin signal">D9 → Servo signal</div>
+            <div class="pin signal">D10 → Ultrasonic Trig</div>
+            <div class="pin signal">D11 → Ultrasonic Echo</div>
+            <div class="pin signal">A0/A1 → Joystick axes</div>
+            <div class="pin i2c">A4/A5 → OLED I2C</div>
+          </div>`,
+        works: `
+          <strong>Arduino as the brain:</strong>
+          <p>
+            The Arduino Uno is a small microcontroller board. It does not “think” like a laptop; instead,
+            it repeats your program very quickly. In this project it reads inputs, decides what to do,
+            and controls outputs.
+          </p>
+          <div class="pin-grid">
+            <div class="pin signal">Inputs: joystick + ultrasonic sensor</div>
+            <div class="pin signal">Outputs: servo + OLED display</div>
+            <div class="pin">Code: the logic that connects everything</div>
+            <div class="pin">Loop: the program runs again and again</div>
+          </div>
+          <div class="learn-more">
+            <span>Learn more:</span>
+            <a href="https://docs.arduino.cc/hardware/uno-rev3/" target="_blank" rel="noopener">Arduino Uno docs</a>
+          </div>`,
+        tips: "Before testing, compare the code pin numbers with the real Arduino pins. Most errors come from one wire in the wrong place."
+      },
+      "Breadboard": {
+        connections: `
+          <strong>Recommended organization:</strong>
+          <div class="pin-grid">
+            <div class="pin power">Arduino 5V → + rail</div>
+            <div class="pin ground">Arduino GND → - rail</div>
+            <div class="pin signal">Signal wires → Arduino pins</div>
+            <div class="pin">Modules → stable rows</div>
+          </div>
+          <div class="connection-note">All GND connections must share the same ground.</div>`,
+        works: `
+          <strong>Breadboard as a temporary circuit:</strong>
+          <p>
+            A breadboard lets you connect components without soldering. Some holes are connected internally,
+            so placing a wire and a component leg in the same connected row creates an electrical path.
+          </p>
+          <div class="pin-grid">
+            <div class="pin power">Power rail: distributes 5V</div>
+            <div class="pin ground">Ground rail: distributes GND</div>
+            <div class="pin signal">Middle rows: connect parts and signals</div>
+            <div class="pin">No solder: easy to test and correct</div>
+          </div>
+          <div class="learn-more">
+            <span>Learn more:</span>
+            <a href="https://learn.sparkfun.com/tutorials/how-to-use-a-breadboard/all" target="_blank" rel="noopener">Breadboard guide</a>
+          </div>`,
+        tips: "Use red wires for 5V and black wires for GND whenever possible. It makes the circuit easier to inspect."
+      },
+      "Joystick": {
+        connections: `
+          <strong>Connect the joystick:</strong>
+          <div class="pin-grid">
+            <div class="pin ground">GND → GND</div>
+            <div class="pin power">5V → 5V</div>
+            <div class="pin signal">URX → A0</div>
+            <div class="pin signal">URY → A1</div>
+            <div class="pin signal">SW → D2</div>
+          </div>`,
+        works: `
+          <strong>Joystick as an analog input:</strong>
+          <p>
+            Inside the joystick there are small variable resistors called potentiometers. When you move the stick,
+            the voltage changes. Arduino reads that voltage as a number, usually from 0 to 1023.
+          </p>
+          <div class="pin-grid">
+            <div class="pin signal">Center value: around 512</div>
+            <div class="pin signal">One side: closer to 0</div>
+            <div class="pin signal">Other side: closer to 1023</div>
+            <div class="pin">Button SW: digital press/release</div>
+          </div>
+          <div class="learn-more">
+            <span>Learn more:</span>
+            <a href="https://docs.arduino.cc/language-reference/en/functions/analog-io/analogRead/" target="_blank" rel="noopener">analogRead()</a>
+          </div>`,
+        tips: "In this build, URY controls left-right servo movement because of the physical orientation of the joystick."
+      },
+      "Micro Servo": {
+        connections: `
+          <strong>Connect the servo:</strong>
+          <div class="pin-grid">
+            <div class="pin signal">Signal → D9</div>
+            <div class="pin power">Red wire → 5V</div>
+            <div class="pin ground">Brown/Black wire → GND</div>
+          </div>
+          <div class="connection-note">If the servo shakes, use an external 5V supply and connect grounds together.</div>`,
+        works: `
+          <strong>Servo as controlled motion:</strong>
+          <p>
+            A servo motor receives repeated control pulses from Arduino. The pulse timing tells the servo
+            which angle to hold. That is why one signal wire can control a full movement range.
+          </p>
+          <div class="pin-grid">
+            <div class="pin signal">Signal: angle command</div>
+            <div class="pin power">Power: motor energy</div>
+            <div class="pin ground">GND: shared reference</div>
+            <div class="pin">Feedback inside: helps hold position</div>
+          </div>
+          <div class="learn-more">
+            <span>Learn more:</span>
+            <a href="https://docs.arduino.cc/libraries/servo/" target="_blank" rel="noopener">Arduino Servo library</a>
+            <a href="https://learn.sparkfun.com/tutorials/hobby-servo-tutorial/all" target="_blank" rel="noopener">Servo tutorial</a>
+          </div>`,
+        tips: "Do not force the servo by hand while powered. It can damage the gears."
+      },
+      "Ultrasonic": {
+        connections: `
+          <strong>Connect the ultrasonic sensor:</strong>
+          <div class="pin-grid">
+            <div class="pin power">VCC → 5V</div>
+            <div class="pin ground">GND → GND</div>
+            <div class="pin signal">Trig → D10</div>
+            <div class="pin signal">Echo → D11</div>
+          </div>`,
+        works: `
+          <strong>Ultrasonic sensing:</strong>
+          <p>
+            The sensor sends a sound pulse that humans cannot hear. When the pulse hits an object, part of it
+            bounces back. Arduino measures the echo time and estimates distance.
+          </p>
+          <div class="pin-grid">
+            <div class="pin signal">Trig: starts the pulse</div>
+            <div class="pin signal">Echo: reports travel time</div>
+            <div class="pin">Shorter time: closer object</div>
+            <div class="pin">Longer time: farther object</div>
+          </div>
+          <div class="learn-more">
+            <span>Learn more:</span>
+            <a href="https://lastminuteengineers.com/arduino-sr04-ultrasonic-sensor-tutorial/" target="_blank" rel="noopener">HC-SR04 guide</a>
+          </div>`,
+        tips: "Very close objects can produce unstable readings. Keep the sensor facing the object clearly."
+      },
+      "OLED Display": {
+        connections: `
+          <strong>Connect the OLED:</strong>
+          <div class="pin-grid">
+            <div class="pin ground">GND → GND</div>
+            <div class="pin power">VCC → 5V</div>
+            <div class="pin i2c">SDA → A4</div>
+            <div class="pin i2c">SCL → A5</div>
+          </div>`,
+        works: `
+          <strong>OLED as visual feedback:</strong>
+          <p>
+            The OLED display receives information from Arduino and turns it into text or graphics. It uses I2C,
+            a communication method where two wires can send organized messages between devices.
+          </p>
+          <div class="pin-grid">
+            <div class="pin i2c">SDA: data line</div>
+            <div class="pin i2c">SCL: clock line</div>
+            <div class="pin">Display address: usually 0x3C</div>
+            <div class="pin">Feedback: distance, angle, alert</div>
+          </div>
+          <div class="learn-more">
+            <span>Learn more:</span>
+            <a href="https://docs.arduino.cc/language-reference/en/functions/communication/wire/" target="_blank" rel="noopener">Arduino Wire/I2C</a>
+            <a href="https://learn.adafruit.com/monochrome-oled-breakouts" target="_blank" rel="noopener">OLED guide</a>
+          </div>`,
+        tips: "If the screen is blank, check if the address is 0x3C or 0x3D and confirm SDA/SCL are not swapped."
+      }
+    };
+
+    document.querySelectorAll(".component-card").forEach(card => {
+      const title = card.querySelector(".component-visual h2").textContent.trim();
+      const panel = card.querySelector(".tab-panel");
+
+      card.querySelectorAll(".tab-button").forEach(button => {
+        button.addEventListener("click", () => {
+          card.querySelectorAll(".tab-button").forEach(item => item.classList.remove("active"));
+          button.classList.add("active");
+          panel.innerHTML = tabContent[title][button.dataset.tab];
+        });
+      });
+    });
+
+    const theoryWindow = document.getElementById("theory-window");
+    document.querySelectorAll(".theory-button").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".theory-button").forEach(item => item.classList.remove("active"));
+        button.classList.add("active");
+        theoryWindow.innerHTML = theoryContent[button.dataset.theory];
+      });
+    });
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll(".component-card").forEach(card => observer.observe(card));
+  </script>
+</body>
+</html>
